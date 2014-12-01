@@ -4,11 +4,11 @@ require "mango.php";
 
 class MangoTest extends PHPUnit_Framework_TestCase {
 
-    const API_KEY = "YOUR_SECRET_TEST_KEY";
-    const PUBLIC_API_KEY = "YOUR_PUBLIC_TEST_KEY";
-
     protected function setUp() {
-        $this->mango = new Mango\Mango(array("api_key" => MangoTest::API_KEY));
+        $this->API_KEY = getenv("MANGO_SECRET_TEST_KEY");
+        $this->PUBLIC_API_KEY = getenv("MANGO_PUBLIC_TEST_KEY");
+
+        $this->mango = new Mango\Mango(array("api_key" => $this->API_KEY));
         $this->customer_data =  array(
             "email" => "test-php@example.org",
             "name" => "Test Customer"
@@ -24,7 +24,7 @@ class MangoTest extends PHPUnit_Framework_TestCase {
             "type" => "visa",
             "ccv" => "123"
         );
-        $response = \Unirest::post(Mango\Mango::BASE_URL . "/tokens/", array("Content-Type" => "application/json", "Accept" => "application/json"), json_encode($testCard), MangoTest::PUBLIC_API_KEY, "");
+        $response = \Unirest::post(Mango\Mango::BASE_URL . "/tokens/", array("Content-Type" => "application/json", "Accept" => "application/json"), json_encode($testCard), $this->PUBLIC_API_KEY, "");
         return $response->body->uid;
     }
 
