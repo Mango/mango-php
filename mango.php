@@ -120,8 +120,8 @@ class Cards extends Resource {
         return $this->request("POST", "/cards/", $options);
     }
 
-    public function update($uid) {
-        return $this->request("PATCH", "/cards/" . $uid , "/");
+    public function update($uid, $options) {
+        return $this->request("PATCH", "/cards/" . $uid . "/", $options);
     }
 
     public function delete($uid) {
