@@ -13,6 +13,7 @@ class MangoTest extends PHPUnit_Framework_TestCase {
             "email" => "test-php@example.org",
             "name" => "Test Customer"
         );
+        $this->client = new Mango\Client();
     }
 
     protected function createToken() {
@@ -24,13 +25,23 @@ class MangoTest extends PHPUnit_Framework_TestCase {
             "type" => "visa",
             "ccv" => "123"
         );
-        $response = \Unirest::post(Mango\Mango::BASE_URL . "/tokens/", array("Content-Type" => "application/json", "Accept" => "application/json"), json_encode($testCard), $this->PUBLIC_API_KEY, "");
-        return $response->body->uid;
+        $response = $this->client->request(
+            "POST",
+            "/tokens/",
+            $this->PUBLIC_API_KEY,
+            $testCard
+        );
+        return $response->uid;
     }
 
     protected function createTokenCCV($ccv) {
-        $response = \Unirest::post(Mango\Mango::BASE_URL . "/ccvs/", array("Content-Type" => "application/json", "Accept" => "application/json"), json_encode(array("ccv" => $ccv)), $this->PUBLIC_API_KEY, "");
-        return $response->body->uid;
+        $response = $this->client->request(
+            "POST",
+            "/ccvs/",
+            $this->PUBLIC_API_KEY,
+            array("ccv" => $ccv)
+        );
+        return $response->uid;
     }
 
 
@@ -63,8 +74,11 @@ class MangoTest extends PHPUnit_Framework_TestCase {
     public function testDeleteCustomer() {
         $customer = $this->mango->Customers->create($this->customer_data);
         $this->mango->Customers->delete($customer->uid);
-        $response = $this->mango->Customers->get($customer->uid);
-        $this->assertEquals($response->status, 404);
+        try {
+            $response = $this->mango->Customers->get($customer->uid);
+        } catch (Mango\NotFound $e) {
+            $this->assertEquals("Resource not found", $e->getMessage());
+        }
     }
 
 
@@ -121,7 +135,7 @@ class MangoTest extends PHPUnit_Framework_TestCase {
             "token" => $token
         ));
         $response = $this->mango->Cards->delete($card->uid);
-        $this->assertEquals($response->uid, $card->uid);
+        $this->assertTrue($response);
     }
 
 
@@ -181,15 +195,18 @@ class MangoTest extends PHPUnit_Framework_TestCase {
         ));
         $queue = $this->mango->Queues->get_list(NULL);
         $this->mango->Queues->delete($queue[0]->uid);
-        $deletedQueue = $this->mango->Queues->get($queue[0]->uid);
-        $this->assertEquals($deletedQueue->status, 404);
+        try {
+            $deletedQueue = $this->mango->Queues->get($queue[0]->uid);
+        } catch (Mango\NotFound $e) {
+            $this->assertEquals("Resource not found", $e->getMessage());
+        }
     }
 
     public function testDeleteAllQueue() {
         $queue = count($this->mango->Queues->get_list(NULL));
         $this->assertTrue($queue > 0);
         $cleanQueue = $this->mango->Queues->delete_all(NULL);
-        $this->assertEquals(count($cleanQueue), 0);
+        $this->assertTrue($cleanQueue);
     }
 
 
