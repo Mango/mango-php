@@ -4,11 +4,11 @@ require "mango.php";
 
 class MangoTest extends PHPUnit_Framework_TestCase {
 
-    const API_KEY = "YOUR_SECRET_TEST_KEY";
-    const PUBLIC_API_KEY = "YOUR_PUBLIC_TEST_KEY";
-
     protected function setUp() {
-        $this->mango = new Mango\Mango(array("api_key" => MangoTest::API_KEY));
+        $this->API_KEY = getenv("MANGO_SECRET_TEST_KEY");
+        $this->PUBLIC_API_KEY = getenv("MANGO_PUBLIC_TEST_KEY");
+
+        $this->mango = new Mango\Mango(array("api_key" => $this->API_KEY));
         $this->customer_data =  array(
             "email" => "test-php@example.org",
             "name" => "Test Customer"
@@ -24,10 +24,17 @@ class MangoTest extends PHPUnit_Framework_TestCase {
             "type" => "visa",
             "ccv" => "123"
         );
-        $response = \Unirest::post(Mango\Mango::BASE_URL . "/tokens/", array("Content-Type" => "application/json", "Accept" => "application/json"), json_encode($testCard), MangoTest::PUBLIC_API_KEY, "");
+        $response = \Unirest::post(Mango\Mango::BASE_URL . "/tokens/", array("Content-Type" => "application/json", "Accept" => "application/json"), json_encode($testCard), $this->PUBLIC_API_KEY, "");
         return $response->body->uid;
     }
 
+    protected function createTokenCCV($ccv) {
+        $response = \Unirest::post(Mango\Mango::BASE_URL . "/ccvs/", array("Content-Type" => "application/json", "Accept" => "application/json"), json_encode(array("ccv" => $ccv)), $this->PUBLIC_API_KEY, "");
+        return $response->body->uid;
+    }
+
+
+    /* Customers */
     public function testCreateCustomer() {
         $customer = $this->mango->Customers->create($this->customer_data);
         $this->assertEquals($customer->email, $this->customer_data["email"]);
@@ -61,12 +68,7 @@ class MangoTest extends PHPUnit_Framework_TestCase {
     }
 
 
-    public function testListQueue() {
-        $queue = $this->mango->Queues->get_list(NULL);
-        $this->assertTrue(is_array($queue));
-    }
-
-
+    /* Cards */
     public function testCreateCard(){
         $customer = $this->mango->Customers->get_list(NULL);
         $customer = $customer[0]->uid;
@@ -78,6 +80,52 @@ class MangoTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(strlen($card->uid) > 0);
     }
 
+    public function testGetCard(){
+        $customer = $this->mango->Customers->get_list(NULL);
+        $customer = $customer[0]->uid;
+        $token = $this->createToken();
+        $card = $this->mango->Cards->create(array(
+            "customer" => $customer,
+            "token" => $token
+        ));
+        $response = $this->mango->Cards->get($card->uid);
+        $this->assertEquals($response->uid, $card->uid);
+    }
+
+    public function testListCards() {
+        $cards = $this->mango->Cards->get_list(NULL);
+        $this->assertTrue(is_array($cards));
+    }
+
+    public function testUpdateCard(){
+        $customer = $this->mango->Customers->get_list(NULL);
+        $customer = $customer[0]->uid;
+        $token = $this->createToken();
+        $card = $this->mango->Cards->create(array(
+            "customer" => $customer,
+            "token" => $token
+        ));
+        $tokenCCV = $this->createTokenCCV(321);
+        $response = $this->mango->Cards->update($card->uid, array(
+            "ccv" => $tokenCCV
+        ));
+        $this->assertEquals($response->uid, $card->uid);
+    }
+
+    public function testDeleteCard(){
+        $customer = $this->mango->Customers->get_list(NULL);
+        $customer = $customer[0]->uid;
+        $token = $this->createToken();
+        $card = $this->mango->Cards->create(array(
+            "customer" => $customer,
+            "token" => $token
+        ));
+        $response = $this->mango->Cards->delete($card->uid);
+        $this->assertEquals($response->uid, $card->uid);
+    }
+
+
+    /* Charges */
     public function testCreateCharge(){
         $token = $this->createToken();
         $charge = $this->mango->Charges->create(array(
@@ -88,6 +136,64 @@ class MangoTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(strlen($charge->uid) > 0);
     }
 
+    public function testGetCharge(){
+        $token = $this->createToken();
+        $charge = $this->mango->Charges->create(array(
+            "amount" => 1000,
+            "email" => "test-php@example.org",
+            "token" => $token
+        ));
+        $response = $this->mango->Charges->get($charge->uid);
+        $this->assertEquals($response->uid, $charge->uid);
+    }
+
+    public function testListCharges() {
+        $charges = $this->mango->Charges->get_list(NULL);
+        $this->assertTrue(is_array($charges));
+    }
+
+
+    /* Queues */
+    public function testGetQueue() {
+        $token = $this->createToken();
+        $charge = $this->mango->Charges->create(array(
+            "amount" => 1000,
+            "email" => "test-php@example.org",
+            "token" => $token,
+            "enqueue" => true
+        ));
+        $queue = $this->mango->Queues->get($charge->queue);
+        $this->assertEquals($queue->resource_uid, $charge->uid);
+    }
+
+    public function testListQueue() {
+        $queue = $this->mango->Queues->get_list(NULL);
+        $this->assertTrue(is_array($queue));
+    }
+
+    public function testDeleteQueue() {
+        $token = $this->createToken();
+        $charge = $this->mango->Charges->create(array(
+            "amount" => 1000,
+            "email" => "test-php@example.org",
+            "token" => $token,
+            "enqueue" => true
+        ));
+        $queue = $this->mango->Queues->get_list(NULL);
+        $this->mango->Queues->delete($queue[0]->uid);
+        $deletedQueue = $this->mango->Queues->get($queue[0]->uid);
+        $this->assertEquals($deletedQueue->status, 404);
+    }
+
+    public function testDeleteAllQueue() {
+        $queue = count($this->mango->Queues->get_list(NULL));
+        $this->assertTrue($queue > 0);
+        $cleanQueue = $this->mango->Queues->delete_all(NULL);
+        $this->assertEquals(count($cleanQueue), 0);
+    }
+
+
+    /* Refunds */
     public function testCreateRefund(){
         $token = $this->createToken();
         $charge = $this->mango->Charges->create(array(
@@ -101,6 +207,27 @@ class MangoTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(strlen($refund->uid) > 0);
     }
 
+    public function testGetRefund(){
+        $token = $this->createToken();
+        $charge = $this->mango->Charges->create(array(
+            "amount" => 1000,
+            "email" => "test-php@example.org",
+            "token" => $token
+        ));
+        $refund = $this->mango->Refunds->create(array(
+            "charge" => $charge->uid
+        ));
+        $response = $this->mango->Refunds->get($refund->uid);
+        $this->assertEquals($response->uid, $refund->uid);
+    }
+
+    public function testListRefunds() {
+        $refunds = $this->mango->Refunds->get_list(NULL);
+        $this->assertTrue(is_array($refunds));
+    }
+
+
+    /* Installments */
     public function testListInstallment() {
         $installment = $this->mango->Installments->get_list(array(
             "cardtype" => "amex"
