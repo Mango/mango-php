@@ -2,7 +2,7 @@
 
 namespace Mango;
 
-require_once "vendor/unirest-php/lib/Unirest.php";
+require_once "vendor/mashape/unirest-php/lib/Unirest.php";
 require_once "errors.php";
 
 class Client {
@@ -39,8 +39,7 @@ class Client {
                 $code = key($error);
                 $message = current($error);
             } catch (\Exception $e) {
-                echo $e;
-                throw new InputValidationError(json_encode($response->body), $response->code);
+                throw new UnhandledError($response->body_raw, $response->code);
             }
             throw new InputValidationError($message, $code);
         }
@@ -49,6 +48,9 @@ class Client {
         }
         if ($response->code == 404) {
             throw new NotFound();
+        }
+        if ($response->code == 403) {
+            throw new InvalidApiKey();
         }
         if ($response->code == 405) {
             throw new MethodNotAllowed();

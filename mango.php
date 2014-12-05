@@ -13,7 +13,7 @@ class Mango {
         $this->api_key = $options["api_key"];
 
         if (!$this->api_key) {
-            throw InvalidApiKey();
+            throw new InvalidApiKey();
         }
 
         $this->Charges = new Charges($this);
@@ -38,7 +38,7 @@ class Resource extends Client {
 
 class Charges extends Resource {
 
-    public function get_list($options = null) {
+    public function get_list($options = NULL) {
         return $this->request("GET", "/charges/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -46,7 +46,7 @@ class Charges extends Resource {
         return $this->request("GET", "/charges/" . $uid . "/", $api_key = $this->mango->api_key);
     }
 
-    public function create($options) {
+    public function create($options = NULL) {
         return $this->request("POST", "/charges/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -55,7 +55,7 @@ class Charges extends Resource {
 
 class Refunds extends Resource {
 
-    public function get_list($options) {
+    public function get_list($options = NULL) {
         return $this->request("GET", "/refunds/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -63,7 +63,7 @@ class Refunds extends Resource {
         return $this->request("GET", "/refunds/" . $uid . "/", $api_key = $this->mango->api_key);
     }
 
-    public function create($options) {
+    public function create($options = NULL) {
         return $this->request("POST", "/refunds/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -72,7 +72,7 @@ class Refunds extends Resource {
 
 class Customers extends Resource {
 
-    public function get_list($options) {
+    public function get_list($options = NULL) {
         return $this->request("GET", "/customers/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -80,11 +80,11 @@ class Customers extends Resource {
         return $this->request("GET", "/customers/" . $uid . "/", $api_key = $this->mango->api_key);
     }
 
-    public function create($options) {
+    public function create($options = NULL) {
         return $this->request("POST", "/customers/", $api_key = $this->mango->api_key, $options);
     }
 
-    public function update($uid, $options) {
+    public function update($uid, $options = NULL) {
         return $this->request("PATCH", "/customers/" . $uid . "/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -97,7 +97,7 @@ class Customers extends Resource {
 
 class Cards extends Resource {
 
-    public function get_list($options) {
+    public function get_list($options = NULL) {
         return $this->request("GET", "/cards/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -105,11 +105,11 @@ class Cards extends Resource {
         return $this->request("GET", "/cards/" . $uid . "/", $api_key = $this->mango->api_key);
     }
 
-    public function create($options) {
+    public function create($options = NULL) {
         return $this->request("POST", "/cards/", $api_key = $this->mango->api_key, $options);
     }
 
-    public function update($uid, $options) {
+    public function update($uid, $options = NULL) {
         return $this->request("PATCH", "/cards/" . $uid . "/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -122,7 +122,7 @@ class Cards extends Resource {
 
 class Queues extends Resource {
 
-    public function get_list($options) {
+    public function get_list($options = NULL) {
         return $this->request("GET", "/queue/", $api_key = $this->mango->api_key, $options);
     }
 
@@ -143,7 +143,7 @@ class Queues extends Resource {
 
 class Installments extends Resource {
 
-    public function get_list($options) {
+    public function get_list($options = NULL) {
         return $this->request("GET", "/installments/", $api_key = $this->mango->api_key);
     }
 
