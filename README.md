@@ -16,7 +16,7 @@ If you're using [Composer](https://github.com/composer/composer):
 ```javascript
 {
   "require" : {
-    "mango/mango-php" : "master"
+    "mango/mango-php" : "dev-master"
   }
 }
 ```
