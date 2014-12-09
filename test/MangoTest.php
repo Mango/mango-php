@@ -166,7 +166,7 @@ class MangoTest extends PHPUnit_Framework_TestCase {
     }
 
 
-    /* Queues */
+    /* Queue */
     public function testGetQueue() {
         $token = $this->createToken();
         $charge = $this->mango->Charges->create(array(
@@ -175,12 +175,12 @@ class MangoTest extends PHPUnit_Framework_TestCase {
             "token" => $token,
             "enqueue" => true
         ));
-        $queue = $this->mango->Queues->get($charge->queue);
+        $queue = $this->mango->Queue->get($charge->queue);
         $this->assertEquals($queue->resource_uid, $charge->uid);
     }
 
     public function testListQueue() {
-        $queue = $this->mango->Queues->get_list();
+        $queue = $this->mango->Queue->get_list();
         $this->assertTrue(is_array($queue));
     }
 
@@ -195,15 +195,15 @@ class MangoTest extends PHPUnit_Framework_TestCase {
             "token" => $token,
             "enqueue" => true
         ));
-        $queue = $this->mango->Queues->get_list();
-        $this->mango->Queues->delete($queue[0]->uid);
-        $deletedQueue = $this->mango->Queues->get($queue[0]->uid);
+        $queue = $this->mango->Queue->get_list();
+        $this->mango->Queue->delete($queue[0]->uid);
+        $deletedQueue = $this->mango->Queue->get($queue[0]->uid);
     }
 
     public function testDeleteAllQueue() {
-        $queue = count($this->mango->Queues->get_list());
+        $queue = count($this->mango->Queue->get_list());
         $this->assertTrue($queue > 0);
-        $cleanQueue = $this->mango->Queues->delete_all();
+        $cleanQueue = $this->mango->Queue->delete_all();
         $this->assertTrue($cleanQueue);
     }
 
@@ -284,7 +284,7 @@ class MangoTest extends PHPUnit_Framework_TestCase {
      */
     public function testAuthenticationError() {
         $mango = new Mango\Mango(array("api_key" => 'asd'));
-        $queue = $mango->Queues->get_list();
+        $queue = $mango->Queue->get_list();
     }
 
     /**

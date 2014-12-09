@@ -20,7 +20,7 @@ class Mango {
         $this->Refunds = new Refunds($this);
         $this->Customers = new Customers($this);
         $this->Cards = new Cards($this);
-        $this->Queues = new Queues($this);
+        $this->Queue = new Queue($this);
         $this->Installments = new Installments($this);
     }
 
@@ -120,7 +120,7 @@ class Cards extends Resource {
 }
 
 
-class Queues extends Resource {
+class Queue extends Resource {
 
     public function get_list($options = NULL) {
         return $this->request("GET", "/queue/", $api_key = $this->mango->api_key, $options);
