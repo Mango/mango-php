@@ -7,11 +7,11 @@ This is a PHP library that allows interaction with [Mango API](https://developer
 ### Dependencies
 
     * PHP 5.3+
-    * cURL for PHP
 
 ### Install with Composer
 
-If you're using [Composer](https://github.com/composer/composer):
+If you're using [Composer](https://github.com/composer/composer), add this to
+your composer.json `require`:
 
 ```javascript
 {
@@ -19,6 +19,12 @@ If you're using [Composer](https://github.com/composer/composer):
     "mango/mango-php" : "dev-master"
   }
 }
+```
+
+And load it using Composer's autoloader
+
+```php
+require 'vendor/autoload.php';
 ```
 
 ### Install from GitHub
@@ -29,10 +35,12 @@ To install the source code:
 $ git clone git@github.com:mango/mango-php.git
 ```
 
-Include it in your code:
+Include `mango-php` in your code and autoload `requests`:
 
 ```php
 require_once '/path/to/mango-php/mango.php';
+require_once '/path/to/rmccue/requests/Requests.php';
+Requests::register_autoloader();
 ```
 
 ## Documentation
@@ -40,10 +48,8 @@ Documentation is available at https://developers.getmango.com/en/api/?platform=p
 
 ## Usage
 
-### Import the library and set your secret API key:
+### Set your secret API key:
 ```php
-require_once "path/to/mango.php";
-
 $mango = new Mango\Mango(array(
     "api_key" => "YOUR_SECRET_API_KEY"
 ));
@@ -64,7 +70,7 @@ var_dump($customer);
 When you have a customer `uid`, you can get a full detail using the `get()` method:
 
 ```php
-$customer = $mango->Customer->get("customer_1uqh884oy1ujh9y9eatm0jo3zxu0rm2s");
+$customer = $mango->Customers->get("customer_1uqh884oy1ujh9y9eatm0jo3zxu0rm2s");
 var_dump($customer);
 ```
 
@@ -78,7 +84,7 @@ You can also work with all the other resources authenticated with a secret API K
 
 ## Tests
 
-Install the module along with the dev dependencies, use composer:
+Install the module along with the dev dependencies using composer:
 ```bash
 $ git clone git://github.com/mango/mango-php.git
 $ cd mango-php
@@ -100,7 +106,7 @@ $ phpunit test
 To run the code coverage you'll need Xdebug
 
 ```bash
-$ phpunit --coverage-html .
+$ phpunit --coverage-html coverage
 ```
 
 ## License
