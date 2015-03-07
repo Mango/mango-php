@@ -244,10 +244,41 @@ class MangoTest extends PHPUnit_Framework_TestCase {
 
     /* Installments */
     public function testListInstallment() {
-        $installment = $this->mango->Installments->get_list();
-        $this->assertTrue(is_array($installment));
+        $installments = $this->mango->Installments->get_list();
+        $this->assertTrue(is_array($installments));
     }
 
+    public function testListInstallmentWithOptions() {
+        $installments = $this->mango->Installments->get_list(array(
+            'cardtype' => 'visa'
+        ));
+        $this->assertTrue(is_array($installments));
+        foreach ( $installments as $key => $val ) {
+            $this->assertEquals($val->cardtype, 'visa');
+        }
+    }
+
+
+    /* Promotions */
+    public function testListPromotions() {
+        $promotions = $this->mango->Promotions->get_list(array(
+            "status" => "active"
+        ));
+        $this->assertTrue(is_array($promotions));
+        foreach ( $promotions as $key => $val ) {
+            $this->assertEquals($val->status, "active");
+        }
+    }
+
+    public function testGetPromotion() {
+        $promotion_list = $this->mango->Promotions->get_list(array(
+            "status" => "active"
+        ));
+        $promotion_uid = $promotion_list[0]->uid;
+        $promotion = $this->mango->Promotions->get($promotion_uid);
+        $this->assertEquals($promotion->status, 'active');
+        $this->assertEquals($promotion->uid, $promotion_uid);
+    }
 
     /* Api Keys */
     /**
