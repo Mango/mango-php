@@ -81,6 +81,7 @@ You can also work with all the other resources authenticated with a secret API K
 - [Cards](https://developers.getmango.com/en/api/cards/?platform=php)
 - [Queue](https://developers.getmango.com/en/api/queue/?platform=php)
 - [Installments](https://developers.getmango.com/en/api/installments/?platform=php)
+- [Promotions](https://developers.getmango.com/en/api/promotions/?platform=php)
 
 ## Tests
 
