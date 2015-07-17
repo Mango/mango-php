@@ -4,7 +4,7 @@ require "mango.php";
 
 class MangoTest extends PHPUnit_Framework_TestCase {
 
-    protected function setUp() {
+  protected function setUp() {
         $this->API_KEY = getenv("MANGO_SECRET_TEST_KEY");
         $this->PUBLIC_API_KEY = getenv("MANGO_PUBLIC_TEST_KEY");
 
@@ -279,6 +279,44 @@ class MangoTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($promotion->status, 'active');
         $this->assertEquals($promotion->uid, $promotion_uid);
     }
+
+
+    /* Coupons */
+    public function testListCoupons(){
+        $coupons = $this->mango->Coupons->get_list();
+        $uid = $coupons[0]->uid;
+        $this->assertTrue(strlen($uid) > 0);
+    }
+
+    public function testGetCoupon(){
+        $coupons = $this->mango->Coupons->get_list();
+        $coupon = $coupons[0];
+        $response = $this->mango->Coupons->get($coupon->uid);
+        $this->assertEquals($response->uid, $coupon->uid);
+    }
+
+    public function testCreateCoupon() {
+        date_default_timezone_set("America/Argentina/Buenos_Aires");
+        $coupon = $this->mango->Coupons->create(array(
+          "amount" => 3000,
+          "type" => "pagofacil",
+          "first_due_date" => date("Y-m-d", mktime(0, 0, 0, date("m")+1, date("d"), date("Y"))),
+          "second_due_date" => date("Y-m-d", mktime(0, 0, 0, date("m")+2, date("d"), date("Y"))),
+          "surcharge" => 20
+        ));
+        $this->assertTrue($coupon->amount == 3000);
+    }
+
+    public function testUpdateCoupon(){
+        $coupons = $this->mango->Coupons->get_list();
+        $coupon = $coupons[0];
+        $response = $this->mango->Coupons->update($coupon->uid, array(
+            "paid" => true
+        ));
+        $this->assertEquals($response->uid, $coupon->uid);
+        $this->assertTrue($response->paid == true);
+    }
+
 
     /* Api Keys */
     /**
