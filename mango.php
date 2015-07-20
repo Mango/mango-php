@@ -23,6 +23,7 @@ class Mango {
         $this->Queue = new Queue($this);
         $this->Installments = new Installments($this);
         $this->Promotions = new Promotions($this);
+        $this->Coupons = new Coupons($this);
     }
 
 }
@@ -159,6 +160,27 @@ class Promotions extends Resource {
 
     public function get($uid) {
         return $this->request("GET", "/promotions/" . $uid . "/", $api_key = $this->mango->api_key);
+    }
+
+}
+
+
+class Coupons extends Resource {
+
+    public function get_list($options = NULL) {
+        return $this->request("GET", "/coupons/", $api_key = $this->mango->api_key, $options);
+    }
+
+    public function get($uid) {
+        return $this->request("GET", "/coupons/" . $uid . "/", $api_key = $this->mango->api_key);
+    }
+
+    public function create($options = NULL) {
+        return $this->request("POST", "/coupons/", $api_key = $this->mango->api_key, $options);
+    }
+
+    public function update($uid, $options = NULL) {
+        return $this->request("PATCH", "/coupons/" . $uid . "/", $api_key = $this->mango->api_key, $options);
     }
 
 }

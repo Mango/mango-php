@@ -82,6 +82,7 @@ You can also work with all the other resources authenticated with a secret API K
 - [Queue](https://developers.getmango.com/en/api/queue/?platform=php)
 - [Installments](https://developers.getmango.com/en/api/installments/?platform=php)
 - [Promotions](https://developers.getmango.com/en/api/promotions/?platform=php)
+- [Coupons](https://developers.getmango.com/en/api/coupons/?platform=php)
 
 ## Tests
 
